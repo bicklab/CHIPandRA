@@ -7,7 +7,7 @@
 #' diagnosis code for a patient to be considered to have that disease
 #'
 #' @details
-#' dx_code_counts_df is a tibble with the four columns: person_id, dx
+#' dx_code_counts_df is a tibble with the four columns: person_id, dx,
 #' dx_count, date_first_dx. The values in dx can be 'RA', 'SPRA', or
 #' 'SNRA'. dx_count is an integer indicating how many times that diagnosis
 #' code was seen on that patient. date_first_dx is the date that diagnosis was
@@ -42,20 +42,42 @@ prepare_ra_outcomes = function(dx_code_counts_df,
 								names_from = 'dx',
 								names_glue = 'date_first_{dx}_sens',
 								values_from = 'date_first_dx') |>
-		left_join(serostatus_df, on = 'person_id') |>
-		left_join(ra_meds_df, on = 'person_id') |>
+		left_join(serostatus_df, by = 'person_id') |>
+		left_join(ra_meds_df, by = 'person_id') |>
 		mutate(
-			date_first_ra_moderate = ifelse(!is.na(seropos) | treated_w_ra_meds, date_first_ra, NA),
-			date_first_spra_moderate = ifelse(seropos | treated_w_ra_meds, date_first_spra, NA),
-			date_first_snra_moderate = ifelse(seropos | treated_w_ra_meds, date_first_snra, NA),
-			date_first_ra_spec = ifelse(!is.na(seropos) & treated_w_ra_meds, date_first_ra, NA),
-			date_first_spra_spec = ifelse(seropos & treated_w_ra_meds, date_first_spra, NA),
-			date_first_snra_spec = ifelse(seropos & treated_w_ra_meds, date_first_snra, NA),
-		) ->
+			date_first_ra_moderate = ifelse(!is.na(seropos) | treated_w_ra_meds, date_first_RA_sens, NA_Date_),
+			date_first_spra_moderate = ifelse(seropos | treated_w_ra_meds, date_first_SPRA_sens, NA_Date_),
+			date_first_snra_moderate = ifelse(seropos | treated_w_ra_meds, date_first_SNRA_sens, NA_Date_),
+			date_first_ra_spec = ifelse(!is.na(seropos) & treated_w_ra_meds, date_first_RA_sens, NA_Date_),
+			date_first_spra_spec = ifelse(seropos & treated_w_ra_meds, date_first_SPRA_sens, NA_Date_),
+			date_first_snra_spec = ifelse(seropos & treated_w_ra_meds, date_first_SNRA_sens, NA_Date_)) |>
+		mutate(across(starts_with('date_first'), as.Date)) ->
 		result
 
 	# not necessary
 	# attr(result, 'num_pts_w_dx') = result |> count(dx)
 
 	return(result)
+}
+
+
+#' @title prepare baseline data
+#'
+#' @param demographics tibble with baseline demographic data. See details.
+#' @param chip_calls tibble with chip call status. See details
+#'
+#' @return baseline data prepped for survival analysis
+#'
+#' @details
+#'
+#'
+#' @examples
+prepare_baseline_data = function(demographics, chip_calls) {
+
+	demographics
+	filter(is.na(date_first_heme_ca) | date_first_heme_ca > biosample_date) |>
+		filter(date_last_dx > biosample_date) |>
+
+
+		return(result)
 }

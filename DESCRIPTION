@@ -3,7 +3,7 @@ Type: Package
 Title: Evaluate the relationship between CHIP and RA
 Version: 0.1.0
 Author: Robert Corty
-Maintainer: Robert Corty
+Maintainer: Robert Corty <robert.corty@vumc.org>
 Description: This package facilitates and streamlines analyses across biobanks
 	for the testing of the relationship between clonal hematopoiesis of
 	indeterminate potential (CHIP) and rheumatoid arthritis (RA).
@@ -14,3 +14,4 @@ Depends:
     tidyverse
 URL: https://github.com/bicklab/CHIPandRA
 BugReports: https://github.com/bicklab/CHIPandRA/issues
+RoxygenNote: 7.3.1

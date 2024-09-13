@@ -40,7 +40,7 @@ prepare_ra_outcomes = function(dx_code_counts_df,
 	result |>
 		pivot_wider(id_cols = 'person_id',
 								names_from = 'dx',
-								names_glue = 'date_first_{dx}_sens',
+								names_glue = 'date_first_{dx}_sensitive',
 								values_from = 'date_first_dx') |>
 		left_join(serostatus_df, by = 'person_id') |>
 		left_join(ra_meds_df, by = 'person_id') |>
@@ -48,9 +48,9 @@ prepare_ra_outcomes = function(dx_code_counts_df,
 			date_first_ra_moderate = ifelse(!is.na(seropos) | treated_w_ra_meds, date_first_RA_sens, NA_Date_),
 			date_first_spra_moderate = ifelse(seropos | treated_w_ra_meds, date_first_SPRA_sens, NA_Date_),
 			date_first_snra_moderate = ifelse(seropos | treated_w_ra_meds, date_first_SNRA_sens, NA_Date_),
-			date_first_ra_spec = ifelse(!is.na(seropos) & treated_w_ra_meds, date_first_RA_sens, NA_Date_),
-			date_first_spra_spec = ifelse(seropos & treated_w_ra_meds, date_first_SPRA_sens, NA_Date_),
-			date_first_snra_spec = ifelse(seropos & treated_w_ra_meds, date_first_SNRA_sens, NA_Date_)) |>
+			date_first_ra_specific = ifelse(!is.na(seropos) & treated_w_ra_meds, date_first_RA_sens, NA_Date_),
+			date_first_spra_specific = ifelse(seropos & treated_w_ra_meds, date_first_SPRA_sens, NA_Date_),
+			date_first_snra_specific = ifelse(seropos & treated_w_ra_meds, date_first_SNRA_sens, NA_Date_)) |>
 		select(-seropos, -treated_w_ra_meds) |>
 		mutate(across(starts_with('date_first'), as.Date)) ->
 		result

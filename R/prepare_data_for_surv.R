@@ -68,7 +68,13 @@ prepare_ra_outcomes = function(dx_code_counts_df,
 #'
 #' @return baseline data prepped for survival analysis
 #'
-#' @details demographics includes:
+#' @details demographics includes: person_id (character), sex (factor),
+#' race (factor), ever_smoker (logical), biosample_date (date),
+#' age_at_biosample (double), age2 (double), date_first_heme_ca (date or NA),
+#' and date_last_dx (date or NA).
+#'
+#' chip_calls includes: person_id (character), chip_gene (string or NA), and
+#' AF (double or NA).
 #'
 prepare_baseline_data = function(demographics, chip_calls) {
 
@@ -80,7 +86,13 @@ prepare_baseline_data = function(demographics, chip_calls) {
 		cohort_for_study
 
 	cohort_for_study |>
-		left_join(chip_calls, by = 'person_id') ->
+		left_join(chip_calls, by = 'person_id') |>
+		mutate(
+			has_chip = !is.na(chip_gene),
+			has_chip10 = has_chip & AF > 0.10,
+			has_chip_d3a = has_chip & chip_gene == 'DNMT3A',
+			has_chip_tet2 = has_chip & chip_gene == 'TET2',
+			has_chip_asxl1 = has_chip & chip_gene == 'ASXL1') ->
 		result
 
 	return(result)

@@ -19,8 +19,11 @@ chip_to_ra_survival = function(bl_data,
 
 	for (ra_type in ra_types) {
 
+		message('Starting ', ra_type, '.........')
+
 		for (sensspec in sensspecs) {
 
+			message('Starting ', sensspec, '......')
 			outcome_str = glue('date_first_{ra_type}_{sensspec}')
 
 			df_for_survprep |>
@@ -37,6 +40,8 @@ chip_to_ra_survival = function(bl_data,
 
 			for(chip_type in chip_types) {
 
+				message('Starting ', chip_type, '...')
+
 				# TODO: calculate time at risk, stratified by chip_type, and store that
 
 				str_form = glue('Surv(time = time_at_risk, event = event) ~ age_at_biosample + age2 + sex + race + ever_smoker + {chip_type}')
@@ -51,8 +56,8 @@ chip_to_ra_survival = function(bl_data,
 					toresult
 				results[[paste0(outcome_str, '_', chip_type)]] = toresult
 			}
-
-
 		}
 	}
+
+	return(bind_rows(results))
 }

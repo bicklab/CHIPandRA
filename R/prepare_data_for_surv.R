@@ -51,11 +51,9 @@ prepare_ra_outcomes = function(dx_code_counts_df,
 			date_first_ra_spec = ifelse(!is.na(seropos) & treated_w_ra_meds, date_first_RA_sens, NA_Date_),
 			date_first_spra_spec = ifelse(seropos & treated_w_ra_meds, date_first_SPRA_sens, NA_Date_),
 			date_first_snra_spec = ifelse(seropos & treated_w_ra_meds, date_first_SNRA_sens, NA_Date_)) |>
+		select(-seropos, -treated_w_ra_meds) |>
 		mutate(across(starts_with('date_first'), as.Date)) ->
 		result
-
-	# not necessary
-	# attr(result, 'num_pts_w_dx') = result |> count(dx)
 
 	return(result)
 }
@@ -70,8 +68,7 @@ prepare_ra_outcomes = function(dx_code_counts_df,
 #'
 #' @details demographics includes: person_id (character), sex (factor),
 #' race (factor), ever_smoker (logical), biosample_date (date),
-#' age_at_biosample (double), age2 (double), date_first_heme_ca (date or NA),
-#' and date_last_dx (date or NA).
+#' age_at_biosample (double), age2 (double), and censor_date (date).
 #'
 #' chip_calls includes: person_id (character), chip_gene (string or NA), and
 #' AF (double or NA).
@@ -79,10 +76,12 @@ prepare_ra_outcomes = function(dx_code_counts_df,
 prepare_baseline_data = function(demographics, chip_calls) {
 
 	demographics |>
-		# must have no heme ca before biosample_date
-		filter(is.na(date_first_heme_ca) | date_first_heme_ca > biosample_date) |>
-		# must have some diagnosis after biosample_date
-		filter(date_last_dx > biosample_date) ->
+		# filter out people with missing data
+		filter(!is.na(person_id), !is.na(sex), !is.na(race)) |>
+		filter(!is.na(ever_smoker), !is.na(biosample_date), !is.na(age_at_biosample)) |>
+		filter(!is.na(age2), !is.na(censor_date)) |>
+		# must have some observation time after biosample_date
+		filter(censor_date > biosample_date) ->
 		cohort_for_study
 
 	cohort_for_study |>

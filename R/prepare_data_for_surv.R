@@ -68,16 +68,20 @@ prepare_ra_outcomes = function(dx_code_counts_df,
 #'
 #' @return baseline data prepped for survival analysis
 #'
-#' @details
+#' @details demographics includes:
 #'
-#'
-#' @examples
 prepare_baseline_data = function(demographics, chip_calls) {
 
-	demographics
-	filter(is.na(date_first_heme_ca) | date_first_heme_ca > biosample_date) |>
-		filter(date_last_dx > biosample_date) |>
+	demographics |>
+		# must have no heme ca before biosample_date
+		filter(is.na(date_first_heme_ca) | date_first_heme_ca > biosample_date) |>
+		# must have some diagnosis after biosample_date
+		filter(date_last_dx > biosample_date) ->
+		cohort_for_study
 
+	cohort_for_study |>
+		left_join(chip_calls, by = 'person_id') ->
+		result
 
-		return(result)
+	return(result)
 }

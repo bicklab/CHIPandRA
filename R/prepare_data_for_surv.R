@@ -47,10 +47,10 @@ prepare_ra_outcomes = function(dx_code_counts_df,
 		mutate(
 			date_first_ra_moderate = ifelse(!is.na(seropos) | treated_w_ra_meds, date_first_ra_sensitive, NA_Date_),
 			date_first_spra_moderate = ifelse(seropos | treated_w_ra_meds, date_first_spra_sensitive, NA_Date_),
-			date_first_snra_moderate = ifelse(seropos | treated_w_ra_meds, date_first_snra_sensitive, NA_Date_),
+			date_first_snra_moderate = ifelse((!seropos) | treated_w_ra_meds, date_first_snra_sensitive, NA_Date_),
 			date_first_ra_specific = ifelse(!is.na(seropos) & treated_w_ra_meds, date_first_ra_sensitive, NA_Date_),
 			date_first_spra_specific = ifelse(seropos & treated_w_ra_meds, date_first_spra_sensitive, NA_Date_),
-			date_first_snra_specific = ifelse(seropos & treated_w_ra_meds, date_first_snra_sensitive, NA_Date_)) |>
+			date_first_snra_specific = ifelse((!seropos) & treated_w_ra_meds, date_first_snra_sensitive, NA_Date_)) |>
 		select(-seropos, -treated_w_ra_meds) |>
 		mutate(across(starts_with('date_first'), as.Date)) ->
 		result
@@ -68,7 +68,8 @@ prepare_ra_outcomes = function(dx_code_counts_df,
 #'
 #' @details demographics includes: person_id (character), sex (factor),
 #' race (factor), ever_smoker (logical), biosample_date (date),
-#' age_at_biosample (double), age2 (double), and censor_date (date).
+#' age_at_biosample (double), age2 (double), date_first_heme_ca
+#' (date or NA), and date_last_dx (date or NA).
 #'
 #' chip_calls includes: person_id (character), chip_gene (string or NA), and
 #' AF (double or NA).
@@ -81,17 +82,20 @@ prepare_baseline_data = function(demographics, chip_calls) {
 		filter(!is.na(ever_smoker), !is.na(biosample_date), !is.na(age_at_biosample)) |>
 		filter(!is.na(age2), !is.na(censor_date)) |>
 		# must have some observation time after biosample_date
-		filter(censor_date > biosample_date) ->
+		filter(date_last_dx > biosample_date) ->
 		cohort_for_study
 
 	cohort_for_study |>
 		left_join(chip_calls, by = 'person_id') |>
+		filter(is.na(date_first_heme_ca) | date_first_heme_ca > biosample_date) |>
 		mutate(
+			censor_date = date_last_dx,
 			has_chip = !is.na(chip_gene),
 			has_chip10 = has_chip & AF > 0.10,
 			has_chip_d3a = has_chip & chip_gene == 'DNMT3A',
 			has_chip_tet2 = has_chip & chip_gene == 'TET2',
-			has_chip_asxl1 = has_chip & chip_gene == 'ASXL1') ->
+			has_chip_asxl1 = has_chip & chip_gene == 'ASXL1') |>
+		select(-date_last_dx) ->
 		result
 
 	return(result)

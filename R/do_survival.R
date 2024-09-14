@@ -20,22 +20,22 @@ chip_to_ra_survival = function(bl_data,
 
 	for (ra_type in ra_types) {
 
-		message('*** Starting ', ra_type, '...')
+		message('\n*** Starting ', ra_type, '...')
 
 		for (sensspec in sensspecs) {
 
-			message('**Starting ', sensspec, '...')
+			message('** Starting ', sensspec, '...')
 			outcome_str = glue('date_first_{ra_type}_{sensspec}')
 
 			df_for_survprep |>
 				# remove people with prevalent disease
-				filter(is.na(.data[[outcome_str]]) | .data[[outcome_str]] > biosample_date) |>
-				# event = had the disease before censoring (not really necessary)
+				# filter(is.na(.data[[outcome_str]]) | .data[[outcome_str]] > biosample_date) |>
+				# event = had the disease before censoring
 				mutate(event = !is.na(.data[[outcome_str]]) & .data[[outcome_str]] < censor_date) |>
 				# time at risk definition
 				mutate(time_at_risk = case_when(event ~ years_between(biosample_date, .data[[outcome_str]]),
 																				.default = years_between(biosample_date, censor_date))) |>
-				# this shouldn't really be necessary...
+				# filters out people with prevalent disease
 				filter(time_at_risk > 0) ->
 				df_for_surv
 

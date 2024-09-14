@@ -80,7 +80,7 @@ prepare_baseline_data = function(demographics, chip_calls) {
 		# filter out people with missing data
 		filter(!is.na(person_id), !is.na(sex), !is.na(race)) |>
 		filter(!is.na(ever_smoker), !is.na(biosample_date), !is.na(age_at_biosample)) |>
-		filter(!is.na(age2), !is.na(censor_date)) |>
+		filter(!is.na(age2), !is.na(date_last_dx)) |>
 		# must have some observation time after biosample_date
 		filter(date_last_dx > biosample_date) ->
 		cohort_for_study

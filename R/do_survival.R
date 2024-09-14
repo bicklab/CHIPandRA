@@ -19,17 +19,17 @@ chip_to_ra_survival = function(bl_data,
 
 	for (ra_type in ra_types) {
 
-		message('Starting ', ra_type, '.........')
+		message('*** Starting ', ra_type, '...')
 
 		for (sensspec in sensspecs) {
 
-			message('Starting ', sensspec, '......')
+			message('**Starting ', sensspec, '...')
 			outcome_str = glue('date_first_{ra_type}_{sensspec}')
 
 			df_for_survprep |>
 				# remove people with prevalent disease
-				filter(is.na(.data[[outcome_str]]) | .data[[outcome_str]] > biosample_date) |>
-				# event = had the disease before censoring
+				# filter(is.na(.data[[outcome_str]]) | .data[[outcome_str]] > biosample_date) |>
+				# event = had the disease before censoring (not really necessary)
 				mutate(event = !is.na(.data[[outcome_str]]) & .data[[outcome_str]] < censor_date) |>
 				# time at risk definition
 				mutate(time_at_risk = case_when(event ~ years_between(biosample_date, .data[[outcome_str]]),
@@ -46,7 +46,8 @@ chip_to_ra_survival = function(bl_data,
 
 				str_form = glue('Surv(time = time_at_risk, event = event) ~ age_at_biosample + age2 + sex + race + ever_smoker + {chip_type}')
 				fit = coxph(as.formula(str_form), data = df_for_surv)
-				tidy(fit, exponentiate = TRUE) |>
+				browser()
+				tidy(fit) |>
 					mutate(ra_type = ra_type,
 								 sensspec = sensspec,
 								 outcome = outcome_str,

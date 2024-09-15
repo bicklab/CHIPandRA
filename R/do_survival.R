@@ -52,7 +52,8 @@ chip_to_ra_survival = function(bl_data,
 								 outcome = outcome_str,
 								 n = nrow(df_for_surv),
 								 n_event = sum(df_for_surv$event),
-								 n_chip = sum(df_for_surv[[chip_type]])) ->
+								 n_chip = sum(df_for_surv[[chip_type]])) |>
+					filter(str_detect(term, 'chip')) ->
 					toresult
 				results[[paste0(outcome_str, '_', chip_type)]] = toresult
 			}

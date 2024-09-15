@@ -107,7 +107,9 @@ prepare_baseline_data = function(demographics, chip_calls) {
 		mutate(
 			censor_date = date_last_dx,
 			has_chip = !is.na(chip_gene),
+			has_chip05 = has_chip & AF > 0.05,
 			has_chip10 = has_chip & AF > 0.10,
+			has_chip15 = has_chip & AF > 0.15,
 			has_chip_d3a = has_chip & chip_gene == 'DNMT3A',
 			has_chip_tet2 = has_chip & chip_gene == 'TET2',
 			has_chip_asxl1 = has_chip & chip_gene == 'ASXL1') |>

@@ -51,21 +51,27 @@ prepare_ra_outcomes = function(dx_code_counts_df,
 		left_join(serostatus_df, by = 'person_id') |>
 		left_join(ra_meds_df, by = 'person_id') |>
 		mutate(
-			date_first_ra_moderate = case_when(!is.na(seropos) | treated_w_ra_meds ~ date_first_ra_sensitive,
-																				 .default = NA_Date_),
-			date_first_spra_moderate = case_when(seropos ~ date_first_ra_sensitive,
-																					 treated_w_ra_meds ~ date_first_spra_sensitive,
-																					 .default = NA_Date_),
-			date_first_snra_moderate = case_when(!seropos ~ date_first_ra_sensitive,
-																					 treated_w_ra_meds ~ date_first_spra_sensitive,
-																					 .default = NA_Date_),
+			date_first_ra_moderate = case_when(
+				!is.na(seropos) | treated_w_ra_meds ~ date_first_ra_sensitive,
+				.default = NA_Date_),
+			date_first_spra_moderate = case_when(
+				seropos ~ date_first_ra_sensitive,
+				treated_w_ra_meds ~ date_first_spra_sensitive,
+				.default = NA_Date_),
+			date_first_snra_moderate = case_when(
+				!seropos ~ date_first_ra_sensitive,
+				treated_w_ra_meds ~ date_first_snra_sensitive,
+				.default = NA_Date_),
 
-			date_first_ra_specific = case_when(!is.na(seropos) & treated_w_ra_meds ~ date_first_ra_sensitive,
-																				 .default = NA_Date_),
-			date_first_spra_specific = case_when(seropos & treated_w_ra_meds ~ date_first_ra_sensitive,
-																					 .default = NA_Date_),
-			date_first_snra_specific = case_when(!seropos & treated_w_ra_meds ~ date_first_ra_sensitive,
-																					 .default = NA_Date_)
+			date_first_ra_specific = case_when(
+				!is.na(seropos) & treated_w_ra_meds ~ date_first_ra_sensitive,
+				.default = NA_Date_),
+			date_first_spra_specific = case_when(
+				seropos & treated_w_ra_meds ~ date_first_ra_sensitive,
+				.default = NA_Date_),
+			date_first_snra_specific = case_when(
+				!seropos & treated_w_ra_meds ~ date_first_ra_sensitive,
+				.default = NA_Date_)
 		) |>
 		select(-seropos, -treated_w_ra_meds) |>
 		mutate(across(starts_with('date_first'), as.Date)) ->

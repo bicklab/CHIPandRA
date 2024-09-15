@@ -7,9 +7,7 @@ chip_to_ra_survival = function(bl_data,
 															 outcomes,
 															 ra_types = c('ra', 'spra', 'snra'),
 															 sensspecs = c('sensitive', 'moderate', 'specific'),
-															 chip_types = c('has_chip', 'has_chip10',
-															 							 'has_chip_d3a', 'has_chip_tet2',
-															 							 'has_chip_asxl1'),
+															 chip_types =  names(select(outcomes, starts_with('date_first'))),
 															 debug = FALSE) {
 
 	bl_data |>
@@ -42,6 +40,14 @@ chip_to_ra_survival = function(bl_data,
 				message('Starting ', chip_type, '...')
 
 				# TODO: calculate time at risk, stratified by chip_type, and store that
+				df_for_surv |>
+					group_by(across(chip_type)) |>
+					summarise(n_event = sum(!is.na(.data[[outcome_str]]))) ->
+					event_counts
+
+				if (min(event_counts$n_event) < 100) {
+					next
+				}
 
 				str_form = glue('Surv(time = time_at_risk, event = event) ~ age_at_biosample + age2 + sex + race + ever_smoker + {chip_type}')
 				fit = coxph(as.formula(str_form), data = df_for_surv)

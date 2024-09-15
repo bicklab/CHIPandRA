@@ -5,7 +5,8 @@ years_between = function(start, end) {
 # TODO
 chip_to_ra_survival = function(bl_data,
 															 outcomes,
-															 min_num_events = 50,
+															 min_num_events = 100,
+															 min_num_events_w_chip = 10,
 															 ra_types = c('ra', 'spra', 'snra'),
 															 sensspecs = c('sensitive', 'moderate', 'specific'),
 															 chip_types =  names(select(outcomes, starts_with('date_first'))),
@@ -46,9 +47,8 @@ chip_to_ra_survival = function(bl_data,
 					summarise(n_event = sum(!is.na(.data[[outcome_str]]))) ->
 					event_counts
 
-				if (min(event_counts$n_event) < min_num_events) {
-					next
-				}
+				if (sum(event_counts$n_event) < min_num_events) { next }
+				if (min(event_counts$n_event) < min_num_events_w_chip) { next }
 
 				str_form = glue('Surv(time = time_at_risk, event = event) ~ age_at_biosample + age2 + sex + race + ever_smoker + {chip_type}')
 				fit = coxph(as.formula(str_form), data = df_for_surv)

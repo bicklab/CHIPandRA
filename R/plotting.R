@@ -14,11 +14,11 @@ one_cohort_all_results_plot = function(results, p_or_q = 'p') {
 			ra_type = factor(ra_type, levels = c('ra', 'spra', 'snra'),
 											 labels = c('RA', 'SPRA', 'SNRA')),
 			`p value` = factor(cut(p.value, breaks = c(0, 0.01, 0.05,  1)),
-												 levels = rev(c('(0,0.01]', '(0.01,0.05]', '(0.05,1]')),
-												 labels = rev(c('< 0.01', '< 0.05', 'n.s.'))),
+												 levels = c('(0,0.01]', '(0.01,0.05]', '(0.05,1]'),
+												 labels = c('< 0.01', '< 0.05', 'n.s.')),
 			`q value` = factor(cut(q.value, breaks = c(0, 0.01, 0.05,  1)),
-												 levels = rev(c('(0,0.01]', '(0.01,0.05]', '(0.05,1]')),
-												 labels = rev(c('< 0.01', '< 0.05', 'n.s.')))
+												 levels = c('(0,0.01]', '(0.01,0.05]', '(0.05,1]'),
+												 labels = c('< 0.01', '< 0.05', 'n.s.'))
 		) |>
 		ggplot(mapping = aes(
 			x = exp(estimate),

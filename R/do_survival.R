@@ -56,7 +56,7 @@ chip_to_ra_survival = function(bl_data,
 				fit = coxph(as.formula(str_form), data = df_for_surv)
 				if (debug) { browser() }
 				tidy(fit) |>
-					mutate(q.value = qvalue(p.value)$qvalues,
+					mutate(q.value = qvalue(p.value, lambda = 0)$qvalues,
 								 ra_type = ra_type,
 								 sensspec = sensspec,
 								 outcome = outcome_str,

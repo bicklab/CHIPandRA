@@ -5,6 +5,7 @@ years_between = function(start, end) {
 # TODO
 chip_to_ra_survival = function(bl_data,
 															 outcomes,
+															 min_num_events = 50,
 															 ra_types = c('ra', 'spra', 'snra'),
 															 sensspecs = c('sensitive', 'moderate', 'specific'),
 															 chip_types =  names(select(outcomes, starts_with('date_first'))),
@@ -45,7 +46,7 @@ chip_to_ra_survival = function(bl_data,
 					summarise(n_event = sum(!is.na(.data[[outcome_str]]))) ->
 					event_counts
 
-				if (min(event_counts$n_event) < 100) {
+				if (min(event_counts$n_event) < min_num_events) {
 					next
 				}
 

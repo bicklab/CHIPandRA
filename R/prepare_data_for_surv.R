@@ -42,15 +42,31 @@ prepare_ra_outcomes = function(dx_code_counts_df,
 								names_from = 'dx',
 								names_glue = 'date_first_{dx}_sensitive',
 								values_from = 'date_first_dx') |>
+		# if SPRA or SNRA was diagnosed before RA, the date of first RA
+		# is moved up to date of first SNRA or SPRA (since those are types of RA)
+		mutate(date_first_ra_sensitive = pmin(date_first_ra_sensitive,
+																					date_first_spra_sensitive,
+																					date_first_snra_sensitive,
+																					na.rm = TRUE)) |>
 		left_join(serostatus_df, by = 'person_id') |>
 		left_join(ra_meds_df, by = 'person_id') |>
 		mutate(
-			date_first_ra_moderate = ifelse(!is.na(seropos) | treated_w_ra_meds, date_first_ra_sensitive, NA_Date_),
-			date_first_spra_moderate = ifelse(seropos | treated_w_ra_meds, date_first_spra_sensitive, NA_Date_),
-			date_first_snra_moderate = ifelse((!seropos) | treated_w_ra_meds, date_first_snra_sensitive, NA_Date_),
-			date_first_ra_specific = ifelse(!is.na(seropos) & treated_w_ra_meds, date_first_ra_sensitive, NA_Date_),
-			date_first_spra_specific = ifelse(seropos & treated_w_ra_meds, date_first_spra_sensitive, NA_Date_),
-			date_first_snra_specific = ifelse((!seropos) & treated_w_ra_meds, date_first_snra_sensitive, NA_Date_)) |>
+			date_first_ra_moderate = case_when(!is.na(seropos) | treated_w_ra_meds ~ date_first_ra_sensitive,
+																				 .default ~ NA_Date_),
+			date_first_spra_moderate = case_when(seropos ~ date_first_ra_sensitive,
+																					 treated_w_ra_meds ~ date_first_spra_sensitive,
+																					 .default ~ NA_Date_),
+			date_first_snra_moderate = case_when(!seropos ~ date_first_ra_sensitive,
+																					 treated_w_ra_meds ~ date_first_spra_sensitive,
+																					 .default ~ NA_Date_),
+
+			date_first_ra_specific = case_when(!is.na(seropos) & treated_w_ra_meds ~ date_first_ra_sensitive,
+																				 .default ~ NA_Date_),
+			date_first_spra_specific = case_when(seropos & treated_w_ra_meds ~ date_first_ra_sensitive,
+																					 .default ~ NA_Date_),
+			date_first_snra_specific = case_when(!seropos & treated_w_ra_meds ~ date_first_ra_sensitive,
+																					 .default ~ NA_Date_)
+		) |>
 		select(-seropos, -treated_w_ra_meds) |>
 		mutate(across(starts_with('date_first'), as.Date)) ->
 		result

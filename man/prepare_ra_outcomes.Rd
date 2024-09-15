@@ -32,7 +32,7 @@ codes, labs, and meds
 Prepare RA Outcomes
 }
 \details{
-dx_code_counts_df is a tibble with the four columns: person_id, dx
+dx_code_counts_df is a tibble with the four columns: person_id, dx,
 dx_count, date_first_dx. The values in dx can be 'RA', 'SPRA', or
 'SNRA'. dx_count is an integer indicating how many times that diagnosis
 code was seen on that patient. date_first_dx is the date that diagnosis was

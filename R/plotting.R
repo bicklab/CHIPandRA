@@ -16,7 +16,6 @@ one_cohort_all_results_plot = function(results, p_or_q = 'p') {
 			`p value` = factor(cut(p.value, breaks = c(0, 0.01, 0.05,  1)),
 												 levels = c('(0,0.01]', '(0.01,0.05]', '(0.05,1]'),
 												 labels = c('< 0.01', '< 0.05', 'n.s.')),
-			q.value = qvalue(p.value, lambda=0)$qvalues,
 			`q value` = factor(cut(q.value, breaks = c(0, 0.01, 0.05,  1)),
 												 levels = c('(0,0.01]', '(0.01,0.05]', '(0.05,1]'),
 												 labels = c('< 0.01', '< 0.05', 'n.s.'))

@@ -29,7 +29,7 @@ one_cohort_all_results_plot = function(results, p_or_q = 'p') {
 		geom_vline(xintercept = 1) +
 		{ if (p_or_q == 'p') geom_pointrange(aes(color = `p value`)) } +
 		{ if (p_or_q == 'q') geom_pointrange(aes(color = `q value`)) } +
-		scale_color_manual(values = c('black', 'blue', 'red'), drop = FALSE) +
+		scale_color_manual(values = c('red', 'blue', 'black'), drop = FALSE) +
 		theme_minimal() +
 		labs(x = 'hazard ratio for RA',
 				 y = NULL,

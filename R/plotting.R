@@ -46,10 +46,8 @@ one_cohort_specific_results_plot = function(results, title, p_or_q = 'p') {
 		filter(sensspec == 'specific') |>
 		mutate(
 			chip_type = factor(str_sub(term, 5, -5),
-												 levels = c('chip', 'chip05', 'chip10', 'chip15',
-												 					 'chip_d3a', 'chip_tet2', 'chip_asxl1'),
-												 labels = c('CHIP', 'CHIP 5%+', 'CHIP 10%+', 'CHIP 15%+',
-												 					 'DNMT3A CHIP', 'TET2 CHIP', 'ASXL1 CHIP')),
+												 levels = c('chip', 'chip05', 'chip10', 'chip15'),
+												 labels = c('CHIP', 'CHIP 5%+', 'CHIP 10%+', 'CHIP 15%+')),
 			sensspec = factor(sensspec, levels = c('sensitive', 'moderate', 'specific')),
 			ra_type = factor(ra_type, levels = c('ra', 'spra', 'snra'),
 											 labels = c('RA', 'SPRA', 'SNRA')),
@@ -60,6 +58,7 @@ one_cohort_specific_results_plot = function(results, title, p_or_q = 'p') {
 												 levels = c('(0,0.01]', '(0.01,0.05]', '(0.05,1]'),
 												 labels = c('< 0.01', '< 0.05', 'n.s.'))
 		) |>
+		filter(!is.na(chip_type)) |>
 		ggplot(mapping = aes(
 			x = exp(estimate),
 			y = chip_type,

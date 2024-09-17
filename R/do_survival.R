@@ -66,9 +66,9 @@ chip_to_ra_survival = function(bl_data,
 								 n = nrow(df_for_surv),
 								 n_chip = sum(df_for_surv[[chip_type]]),
 								 n_event = sum(event_counts$n_event),
-								 n_events_w_chip = min(event_counts$n_event),
-								 time_at_risk_nochip = py['FALSE'],
-								 time_at_risk_chip = py['TRUE']
+								 n_events_w_chip = min(event_counts$n_event)#,
+								 # time_at_risk_nochip = py['FALSE'],
+								 # time_at_risk_chip = py['TRUE']
 
 					) |>
 					filter(str_detect(term, 'chip')) ->

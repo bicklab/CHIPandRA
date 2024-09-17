@@ -46,17 +46,18 @@ chip_to_ra_survival = function(bl_data,
 					summarise(n_event = sum(!is.na(.data[[outcome_str]]))) ->
 					event_counts
 
-				# if (sum(event_counts$n_event) < min_num_events) { next }
-				# if (min(event_counts$n_event) < min_num_events_w_chip) { next }
+				if (sum(event_counts$n_event) < min_num_events) { next }
+				if (min(event_counts$n_event) < min_num_events_w_chip) { next }
 
-				# str_form = glue('time_at_risk ~ {chip_type}')
-				# py = pyears(as.formula(str_form), df_for_surv)$pyears
+				str_form = glue('time_at_risk ~ {chip_type}')
+				py = pyears(as.formula(str_form), df_for_surv)$pyears
 
-				# str_form = glue('Surv(time = time_at_risk, event = event) ~ age_at_biosample + age2 + sex + race + ever_smoker + {chip_type}')
-				# fit = coxph(as.formula(str_form), data = df_for_surv)
+				str_form = glue('Surv(time = time_at_risk, event = event) ~ age_at_biosample + age2 + sex + race + ever_smoker + {chip_type}')
+				fit = coxph(as.formula(str_form), data = df_for_surv)
 
-				str_form = glue('event ~ age_at_biosample + age2 + sex + race + ever_smoker + {chip_type}')
-				fit = glm(formula = as.formula(str_form), data = df_for_surv, family = 'binomial')
+				# str_form = glue('event ~ age_at_biosample + age2 + sex + race + ever_smoker + {chip_type}')
+				# fit = glm(formula = as.formula(str_form), data = df_for_surv, family = 'binomial')
+
 				if (debug) { browser() }
 				tidy(fit) |>
 					mutate(q.value = qvalue(p.value, lambda = 0)$qvalues,
@@ -66,9 +67,9 @@ chip_to_ra_survival = function(bl_data,
 								 n = nrow(df_for_surv),
 								 n_chip = sum(df_for_surv[[chip_type]]),
 								 n_event = sum(event_counts$n_event),
-								 n_events_w_chip = min(event_counts$n_event)#,
-								 # time_at_risk_nochip = py['FALSE'],
-								 # time_at_risk_chip = py['TRUE']
+								 n_events_w_chip = min(event_counts$n_event),
+								 time_at_risk_nochip = py['FALSE'],
+								 time_at_risk_chip = py['TRUE']
 
 					) |>
 					filter(str_detect(term, 'chip')) ->

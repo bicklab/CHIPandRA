@@ -56,7 +56,7 @@ chip_to_ra_survival = function(bl_data,
 				# fit = coxph(as.formula(str_form), data = df_for_surv)
 
 				str_form = glue('event ~ age_at_biosample + age2 + sex + race + ever_smoker + {chip_type}')
-				fit = glm(formula = as.formula(str_form), data = df_for_suv, family = 'binomial')
+				fit = glm(formula = as.formula(str_form), data = df_for_surv, family = 'binomial')
 				if (debug) { browser() }
 				tidy(fit) |>
 					mutate(q.value = qvalue(p.value, lambda = 0)$qvalues,

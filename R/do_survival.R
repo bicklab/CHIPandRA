@@ -29,7 +29,7 @@ chip_to_ra_survival = function(bl_data,
 
 			df_for_survprep |>
 				# remove people with prevalent disease
-				filter(is.na(.data[[outcome_str]]) | .data[[outcome_str]] > biosample_date) |>
+				# filter(is.na(.data[[outcome_str]]) | .data[[outcome_str]] > biosample_date) |>
 				# event = had the disease before censoring
 				mutate(event = !is.na(.data[[outcome_str]]) & .data[[outcome_str]] < censor_date) |>
 				# time at risk definition
@@ -46,14 +46,17 @@ chip_to_ra_survival = function(bl_data,
 					summarise(n_event = sum(!is.na(.data[[outcome_str]]))) ->
 					event_counts
 
-				if (sum(event_counts$n_event) < min_num_events) { next }
-				if (min(event_counts$n_event) < min_num_events_w_chip) { next }
+				# if (sum(event_counts$n_event) < min_num_events) { next }
+				# if (min(event_counts$n_event) < min_num_events_w_chip) { next }
 
-				str_form = glue('time_at_risk ~ {chip_type}')
-				py = pyears(as.formula(str_form), df_for_surv)$pyears
+				# str_form = glue('time_at_risk ~ {chip_type}')
+				# py = pyears(as.formula(str_form), df_for_surv)$pyears
 
-				str_form = glue('Surv(time = time_at_risk, event = event) ~ age_at_biosample + age2 + sex + race + ever_smoker + {chip_type}')
-				fit = coxph(as.formula(str_form), data = df_for_surv)
+				# str_form = glue('Surv(time = time_at_risk, event = event) ~ age_at_biosample + age2 + sex + race + ever_smoker + {chip_type}')
+				# fit = coxph(as.formula(str_form), data = df_for_surv)
+
+				str_form = glue('event ~ age_at_biosample + age2 + sex + race + ever_smoker + {chip_type}')
+				fit = glm(formula = as.formula(str_form), data = df_for_suv, family = 'binomial')
 				if (debug) { browser() }
 				tidy(fit) |>
 					mutate(q.value = qvalue(p.value, lambda = 0)$qvalues,

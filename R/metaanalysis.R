@@ -72,11 +72,19 @@
 # 	all_results
 #
 # all_results |>
-# 	group_by(cohort, ra_type, sensspec) |>
-# 	summarise(n = unique(n),
-# 						n_event = unique(n_event),
-# 						p_event = round(100 * n_event / n, 1)) |>
-# 	print(n = Inf)
+# 	filter(term == 'has_chipTRUE') |>
+# 	filter(sensspec == 'moderate') |>
+# 	select(ra_type, sensspec, n:cohort) |>
+# 	mutate(event_rate = 100 *n_event / (time_at_risk_nochip + time_at_risk_chip),
+# 				 event_rate_nochip = (n_event - n_events_w_chip)/time_at_risk_nochip,
+# 				 event_rate_chip = (n_events_w_chip)/time_at_risk_chip) |>
+# 	select(cohort, ra_type, sensspec, starts_with('event_rate'))
+#
+# # group_by(cohort, ra_type) |>
+# # 	summarise(num_studied = length(n),
+# # 						n_event = unique(n_event),
+# # 						p_event = round(100 * n_event / n(), 1)) |>
+# # 	print(n = Inf)
 #
 # all_results |> arrange(p.value) |> print(n = 20)
 #

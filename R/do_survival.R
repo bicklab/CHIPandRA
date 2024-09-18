@@ -29,7 +29,7 @@ chip_to_ra_survival = function(bl_data,
 
 			df_for_survprep |>
 				# remove people with prevalent disease
-				# filter(is.na(.data[[outcome_str]]) | .data[[outcome_str]] > biosample_date) |>
+				filter(is.na(.data[[outcome_str]]) | .data[[outcome_str]] > biosample_date) |>
 				# event = had the disease before censoring
 				mutate(event = !is.na(.data[[outcome_str]]) & .data[[outcome_str]] < censor_date) |>
 				# time at risk definition

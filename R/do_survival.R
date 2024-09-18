@@ -43,7 +43,10 @@ chip_to_ra_survival = function(bl_data,
 
 				df_for_surv |>
 					group_by(across(chip_type)) |>
-					summarise(n_event = sum(!is.na(.data[[outcome_str]]))) ->
+					summarise(
+						n_event = sum(!is.na(.data[[outcome_str]])),
+						median_fu = median(time_at_risk)) |>
+					arrange({{chip_type}}) ->
 					event_counts
 
 				if (sum(event_counts$n_event) < min_num_events) { next }
@@ -64,13 +67,15 @@ chip_to_ra_survival = function(bl_data,
 								 ra_type = ra_type,
 								 sensspec = sensspec,
 								 outcome = outcome_str,
-								 n = nrow(df_for_surv),
+								 n_nochip = nrow(df_for_surv) - sum(df_for_surv[[chip_type]]),
 								 n_chip = sum(df_for_surv[[chip_type]]),
-								 n_event = sum(event_counts$n_event),
-								 n_events_w_chip = min(event_counts$n_event),
+								 n_events_nochip = event_counts$n_event[1],
+								 n_events_w_chip = event_counts$n_event[2],
 								 time_at_risk_nochip = py['FALSE'],
-								 time_at_risk_chip = py['TRUE']
-
+								 time_at_risk_chip = py['TRUE'],
+								 median_fu = median(df_for_surv$time_at_risk),
+								 median_fu_nochip = event_counts$median_fu[1],
+								 median_fu_chip = event_counts$median_fu[2]
 					) |>
 					filter(str_detect(term, 'chip')) ->
 					toresult

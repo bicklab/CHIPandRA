@@ -32,7 +32,7 @@ chip_to_ra_survival = function(bl_data,
 				# filter(is.na(.data[[outcome_str]]) | .data[[outcome_str]] > biosample_date) |>
 				# event = had the disease before censoring
 				# mutate(event = !is.na(.data[[outcome_str]]) & .data[[outcome_str]] < censor_date) |>
-				mutate(event = !is.na(.data[[outcome_str]])) |>
+				mutate(event = !is.na(.data[[outcome_str]])) ->
 				# time at risk definition
 				# mutate(time_at_risk = case_when(event ~ years_between(biosample_date, .data[[outcome_str]]),
 				# 																.default = years_between(biosample_date, censor_date))) ->

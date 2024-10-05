@@ -1,3 +1,12 @@
+#' @title one cohort all results plot
+#'
+#' @param results the results to plot
+#' @param title the title of the plot
+#' @param p_or_q plot using p values or q values
+#'
+#' @return the plot
+#' @export
+#'
 one_cohort_all_results_plot = function(results, title, p_or_q = 'p') {
 
 	stopifnot(p_or_q %in% c('p', 'q'))
@@ -37,13 +46,21 @@ one_cohort_all_results_plot = function(results, title, p_or_q = 'p') {
 		facet_grid(rows = vars(ra_type, sensspec))
 }
 
+#' @title one cohort specific results plot
+#'
+#' @param results the results to plot
+#' @param title the title of the plot
+#' @param p_or_q plot using p values or q values
+#'
+#' @return the plot
+#' @export
+#'
 one_cohort_specific_results_plot = function(results, title, p_or_q = 'p') {
 
 	stopifnot(p_or_q %in% c('p', 'q'))
 	p_or_q_name = paste0(p_or_q, ' value')
 
 	results |>
-		filter(sensspec == 'specific') |>
 		mutate(
 			chip_type = factor(str_sub(term, 5, -5),
 												 levels = c('chip', 'chip05', 'chip10', 'chip15'),
@@ -59,6 +76,8 @@ one_cohort_specific_results_plot = function(results, title, p_or_q = 'p') {
 												 labels = c('< 0.01', '< 0.05', 'n.s.'))
 		) |>
 		filter(!is.na(chip_type)) |>
+		arrange(ra_type, chip_type, desc(sensspec)) |>
+		distinct(ra_type, chip_type, .keep_all = TRUE) |>
 		ggplot(mapping = aes(
 			x = exp(estimate),
 			y = chip_type,

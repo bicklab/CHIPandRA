@@ -1,10 +1,31 @@
+#' @title years between
+#'
+#' @param start start date
+#' @param end end date
+#'
+#' @return the number of days between the two dates
+#' @export
+#'
 years_between = function(start, end) {
 	as.numeric(difftime(end, start, units = "days"))/365.24
 }
 
 
-chip_to_ra_survival = function(bl_data,
-															 outcomes,
+#' @title CHIP to RA survival analysis
+#'
+#' @param bl_data baseline data
+#' @param outcomes outcome data
+#' @param min_num_events mnimum number of events (outcomes) needed to be observed to continue with analysis
+#' @param min_num_events_w_chip minimum number of events (outcomes) needed to be onbserved among people with CHIP to continue analysis
+#' @param ra_types types of RA to study
+#' @param sensspecs spectrum of sensitive to specific to study
+#' @param chip_types types of CHIP to study
+#' @param debug flag to debug vs run normally
+#'
+#' @return results tibble
+#' @export
+#'
+chip_to_ra_survival = function(bl_data,outcomes,
 															 min_num_events = 100,
 															 min_num_events_w_chip = 10,
 															 ra_types = c('ra', 'spra', 'snra'),

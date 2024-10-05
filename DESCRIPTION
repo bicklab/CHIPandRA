@@ -14,9 +14,10 @@ Depends:
     tidyverse
 URL: https://github.com/bicklab/CHIPandRA
 BugReports: https://github.com/bicklab/CHIPandRA/issues
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Imports: 
     broom,
     glue,
+    metafor,
     qvalue,
     survival

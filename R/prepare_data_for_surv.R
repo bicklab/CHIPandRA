@@ -100,7 +100,7 @@ prepare_ra_outcomes = function(dx_code_counts_df,
 #' chip_calls includes: person_id (character), chip_gene (string or NA), and
 #' AF (double or NA).
 #'
-prepare_baseline_data = function(demographics, chip_calls, MIN_NUM_DX) {
+prepare_baseline_data = function(demographics, chip_calls, MIN_NUM_DX = 5) {
 
 	demographics |>
 		# filter out people with missing data

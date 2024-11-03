@@ -40,37 +40,41 @@ prepare_ra_outcomes = function(dx_code_counts_df,
 	result |>
 		pivot_wider(id_cols = 'person_id',
 								names_from = 'dx',
-								names_glue = 'date_first_{dx}_sensitive',
+								names_glue = 'date_first_{dx}',
 								values_from = 'date_first_dx') |>
 		# if SPRA or SNRA was diagnosed before RA, the date of first RA
 		# is moved up to date of first SNRA or SPRA (since those are types of RA)
-		mutate(date_first_ra_sensitive = pmin(date_first_ra_sensitive,
-																					date_first_spra_sensitive,
-																					date_first_snra_sensitive,
-																					na.rm = TRUE)) |>
+		mutate(date_first_ra = pmin(date_first_ra,
+																date_first_spra,
+																date_first_snra,
+																na.rm = TRUE)) |>
 		left_join(serostatus_df, by = 'person_id') |>
 		left_join(ra_meds_df, by = 'person_id') |>
 		mutate(
-			date_first_ra_moderate = case_when(
-				!is.na(seropos) | treated_w_ra_meds ~ date_first_ra_sensitive,
-				.default = NA_Date_),
-			date_first_spra_moderate = case_when(
-				seropos ~ date_first_ra_sensitive,
-				treated_w_ra_meds ~ date_first_spra_sensitive,
-				.default = NA_Date_),
-			date_first_snra_moderate = case_when(
-				!seropos ~ date_first_ra_sensitive,
-				treated_w_ra_meds ~ date_first_snra_sensitive,
+			date_first_ra_or = case_when(
+				!is.na(seropos) | treated_w_ra_meds ~ date_first_ra,
 				.default = NA_Date_),
 
-			date_first_ra_specific = case_when(
-				!is.na(seropos) & treated_w_ra_meds ~ date_first_ra_sensitive,
+			date_first_spra_or = case_when(
+				seropos ~ date_first_ra,
+				treated_w_ra_meds ~ date_first_spra,
 				.default = NA_Date_),
-			date_first_spra_specific = case_when(
-				seropos & treated_w_ra_meds ~ date_first_ra_sensitive,
+
+			date_first_snra_or = case_when(
+				!seropos ~ date_first_ra,
+				treated_w_ra_meds ~ date_first_snra,
 				.default = NA_Date_),
-			date_first_snra_specific = case_when(
-				!seropos & treated_w_ra_meds ~ date_first_ra_sensitive,
+
+			date_first_ra_and = case_when(
+				!is.na(seropos) & treated_w_ra_meds ~ date_first_ra,
+				.default = NA_Date_),
+
+			date_first_spra_and = case_when(
+				seropos & treated_w_ra_meds ~ date_first_ra,
+				.default = NA_Date_),
+
+			date_first_snra_and = case_when(
+				!seropos & treated_w_ra_meds ~ date_first_ra,
 				.default = NA_Date_)
 		) |>
 		select(-seropos, -treated_w_ra_meds) |>

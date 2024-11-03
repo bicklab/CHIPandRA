@@ -100,13 +100,15 @@ prepare_ra_outcomes = function(dx_code_counts_df,
 #' chip_calls includes: person_id (character), chip_gene (string or NA), and
 #' AF (double or NA).
 #'
-prepare_baseline_data = function(demographics, chip_calls) {
+prepare_baseline_data = function(demographics, chip_calls, MIN_NUM_DX) {
 
 	demographics |>
 		# filter out people with missing data
 		filter(!is.na(person_id), !is.na(sex), !is.na(race)) |>
 		filter(!is.na(ever_smoker), !is.na(biosample_date), !is.na(age_at_biosample)) |>
 		filter(!is.na(age2), !is.na(date_last_dx)) |>
+		# must have at least 5 dx codes observed
+		filter(num_dx >= MIN_NUM_DX) |>
 		# must have some observation time after biosample_date
 		filter(date_last_dx > biosample_date) ->
 		cohort_for_study
@@ -122,7 +124,10 @@ prepare_baseline_data = function(demographics, chip_calls) {
 			has_chip15 = has_chip & AF > 0.15,
 			has_chip_d3a = has_chip & chip_gene == 'DNMT3A',
 			has_chip_tet2 = has_chip & chip_gene == 'TET2',
-			has_chip_asxl1 = has_chip & chip_gene == 'ASXL1') |>
+			has_chip_asxl1 = has_chip & chip_gene == 'ASXL1',
+			has_chip_d3a_10 = has_chip10 & has_chip_d3a,
+			has_chip_tet2_10 = has_chip10 & has_chip_tet2,
+			has_chip_asxl1_10 = has_chip10 & has_chip_asxl1) |>
 		select(-date_last_dx) ->
 		result
 

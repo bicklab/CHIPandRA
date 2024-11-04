@@ -26,8 +26,8 @@ years_between = function(start, end) {
 #' @export
 #'
 chip_to_ra_survival = function(bl_data,outcomes,
-															 min_num_events = 100,
-															 min_num_events_w_chip = 10,
+															 min_num_events = 10,
+															 min_num_events_w_chip = 1,
 															 ra_types = c('ra', 'spra', 'snra'),
 															 sensspecs = c('or', 'and'),
 															 chip_types =  names(select(bl_data, starts_with('has_chip'))),
@@ -76,15 +76,22 @@ chip_to_ra_survival = function(bl_data,outcomes,
 				str_form = glue('time_at_risk ~ {chip_type}')
 				py = pyears(as.formula(str_form), df_for_surv)$pyears
 
+				if (debug) { browser() }
+
 				str_form = glue('Surv(time = time_at_risk, event = event) ~ age_at_biosample + age2 + sex + race + ever_smoker + {chip_type}')
-				fit = coxph(as.formula(str_form), data = df_for_surv)
+				fit = tryCatch(
+					coxph(as.formula(str_form), data = df_for_surv),
+					finally = NULL
+				)
 
 				if (debug) { browser() }
+
 				tidy(fit) |>
 					mutate(q.value = qvalue(p.value, lambda = 0)$qvalues,
 								 ra_type = ra_type,
 								 sensspec = sensspec,
 								 outcome = outcome_str,
+								 num_prevalent_dz = nrow(df_for_survprep) - nrow(df_for_surv),
 								 n_nochip = nrow(df_for_surv) - sum(df_for_surv[[chip_type]]),
 								 n_chip = sum(df_for_surv[[chip_type]]),
 								 n_events_nochip = event_counts$n_event[1],

@@ -65,6 +65,7 @@ one_cohort_specific_results_plot = function(results, title, p_or_q = 'p') {
 	p_or_q_name = paste0(p_or_q, ' value')
 
 	results |>
+		filter(sensspec == 'and') |>
 		mutate(
 			chip_type = factor(str_sub(term, 5, -5),
 												 levels = c('chip', 'chip05', 'chip10', 'chip15',

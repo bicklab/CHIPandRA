@@ -9,7 +9,7 @@
 #' @export
 #'
 one_cohort_results_plot = function(results,
-																	 title,
+																	 title = 'Hazard Ratio of CHIP for Incident RA',
 																	 andor = 'and',
 																	 p_or_q = 'p') {
 
@@ -19,11 +19,11 @@ one_cohort_results_plot = function(results,
 		mutate(ra_type = factor(ra_type, levels = c('ra', 'spra', 'snra'), labels = c('RA', 'SPRA', 'SNRA'))) |>
 		mutate(gene = as.numeric(factor(gene, levels = c('chip', 'dnmt3a', 'tet2', 'asxl1')))) |>
 		mutate(size = 0.2*as.numeric(factor(size, levels = c('small', 'big'))) - 0.3) |>
-		mutate(stars = case_when(p_or_q == 'p' & p.value < 0.001 ~ ', **',
-														 p_or_q == 'p' & p.value < 0.01 ~ ', *',
+		mutate(stars = case_when(p_or_q == 'p' & p.value < 0.001 ~ '**',
+														 p_or_q == 'p' & p.value < 0.01 ~ '*',
 														 p_or_q == 'p' ~ '',
-														 p_or_q == 'q' & q.value < 0.001 ~ ', **',
-														 p_or_q == 'q' & q.value < 0.01 ~ ', *',
+														 p_or_q == 'q' & q.value < 0.001 ~ '**',
+														 p_or_q == 'q' & q.value < 0.01 ~ '*',
 														 p_or_q == 'q' ~ '',
 														 .default = 'ERROR')) |>
 		ggplot(mapping = aes(
@@ -42,7 +42,7 @@ one_cohort_results_plot = function(results,
 		theme_bw() +
 		xlab('CHIP type') +
 		ylab('Hazard ratio') +
-		ggtitle('Hazard Ratio of CHIP for Incident RA')
+		ggtitle(title)
 }
 
 #' @title one cohort specific results plot

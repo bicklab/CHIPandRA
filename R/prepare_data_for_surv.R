@@ -122,33 +122,33 @@ prepare_baseline_data = function(demographics,
 		mutate(
 			censor_date = date_last_dx,
 			has_chip = case_when(
-				is.na(chip_gene) ~ 'none',
-				AF < CHIP_VAF_CUTOFF ~ 'small',
-				AF >= CHIP_VAF_CUTOFF ~ 'big'
+				is.na(chip_gene) ~ '_none',
+				AF < CHIP_VAF_CUTOFF ~ '_small',
+				AF >= CHIP_VAF_CUTOFF ~ '_big'
 			),
 			has_dnmt3a = case_when(
-				is.na(chip_gene) ~ 'none',
+				is.na(chip_gene) ~ '_none',
 				chip_gene != 'DNMT3A' ~ NA,
-				AF < CHIP_VAF_CUTOFF ~ 'small',
-				AF >= CHIP_VAF_CUTOFF ~ 'big'
+				AF < CHIP_VAF_CUTOFF ~ '_small',
+				AF >= CHIP_VAF_CUTOFF ~ '_big'
 			),
 			has_tet2 = case_when(
-				is.na(chip_gene) ~ 'none',
+				is.na(chip_gene) ~ '_none',
 				chip_gene != 'TET2' ~ NA,
-				AF < CHIP_VAF_CUTOFF ~ 'small',
-				AF >= CHIP_VAF_CUTOFF ~ 'big'
+				AF < CHIP_VAF_CUTOFF ~ '_small',
+				AF >= CHIP_VAF_CUTOFF ~ '_big'
 			),
 			has_asxl1 = case_when(
-				is.na(chip_gene) ~ 'none',
+				is.na(chip_gene) ~ '_none',
 				chip_gene != 'ASXL1' ~ NA,
-				AF < CHIP_VAF_CUTOFF ~ 'small',
-				AF >= CHIP_VAF_CUTOFF ~ 'big'
+				AF < CHIP_VAF_CUTOFF ~ '_small',
+				AF >= CHIP_VAF_CUTOFF ~ '_big'
 			)
 		) |>
-		mutate(has_chip = factor(has_chip, levels = c('none', 'small', 'big')),
-					 has_dnmt3a = factor(has_dnmt3a, levels = c('none', 'small', 'big')),
-					 has_tet2 = factor(has_tet2, levels = c('none', 'small', 'big')),
-					 has_asxl1 = factor(has_asxl1, levels = c('none', 'small', 'big'))) |>
+		mutate(has_chip = factor(has_chip, levels = c('_none', '_small', '_big')),
+					 has_dnmt3a = factor(has_dnmt3a, levels = c('_none', '_small', '_big')),
+					 has_tet2 = factor(has_tet2, levels = c('_none', '_small', '_big')),
+					 has_asxl1 = factor(has_asxl1, levels = c('_none', '_small', '_big'))) |>
 		select(-date_last_dx) ->
 		result
 

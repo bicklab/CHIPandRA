@@ -142,7 +142,7 @@ prepare_baseline_data = function(demographics, chip_calls, MIN_NUM_DX = 5) {
 				AF >= 0.1 ~ 'big_chip'
 			)
 		) |>
-		mutate(has_chip = factor(has_chip, levels = c('no_chip', 'small_chip', 'small_chip')),
+		mutate(has_chip = factor(has_chip, levels = c('no_chip', 'small_chip', 'big_chip')),
 					 has_dnmt3a = factor(has_dnmt3a, levels = c('no_chip', 'small_chip', 'big_chip')),
 					 has_tet2 = factor(has_tet2, levels = c('no_chip', 'small_chip', 'big_chip')),
 					 has_asxl1 = factor(has_asxl1, levels = c('no_chip', 'small_chip', 'big_chip'))) |>

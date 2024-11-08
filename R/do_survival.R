@@ -25,7 +25,8 @@ years_between = function(start, end) {
 #' @return results tibble
 #' @export
 #'
-chip_to_ra_survival = function(bl_data,outcomes,
+chip_to_ra_survival = function(bl_data,
+															 outcomes,
 															 min_num_events = 10,
 															 min_num_events_w_chip = 1,
 															 ra_types = c('ra', 'spra', 'snra'),
@@ -92,8 +93,9 @@ chip_to_ra_survival = function(bl_data,outcomes,
 								 sensspec = sensspec,
 								 outcome = outcome_str,
 								 num_prevalent_dz = nrow(df_for_survprep) - nrow(df_for_surv),
-								 n_nochip = nrow(df_for_surv) - sum(df_for_surv[[chip_type]]),
-								 n_chip = sum(df_for_surv[[chip_type]]),
+								 n_nochip = sum(df_for_surv[[chip_type]] == 'no_chip'),
+								 n_smallchip = sum(str_detect(df_for_surv[[chip_type]], 'small')),
+								 n_bigchip = sum(str_detect(df_for_surv[[chip_type]], 'big')),
 								 n_events_nochip = event_counts$n_event[1],
 								 n_events_w_chip = event_counts$n_event[2],
 								 time_at_risk_nochip = py['FALSE'],

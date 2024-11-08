@@ -118,16 +118,30 @@ prepare_baseline_data = function(demographics, chip_calls, MIN_NUM_DX = 5) {
 		filter(is.na(date_first_heme_ca) | date_first_heme_ca > biosample_date) |>
 		mutate(
 			censor_date = date_last_dx,
-			has_chip = !is.na(chip_gene),
-			has_chip05 = has_chip & AF > 0.05,
-			has_chip10 = has_chip & AF > 0.10,
-			has_chip15 = has_chip & AF > 0.15,
-			has_chip_d3a = has_chip & chip_gene == 'DNMT3A',
-			has_chip_tet2 = has_chip & chip_gene == 'TET2',
-			has_chip_asxl1 = has_chip & chip_gene == 'ASXL1',
-			has_chip_d3a_10 = has_chip10 & has_chip_d3a,
-			has_chip_tet2_10 = has_chip10 & has_chip_tet2,
-			has_chip_asxl1_10 = has_chip10 & has_chip_asxl1) |>
+			has_chip = case_when(
+				is.na(chip_gene) ~ 'no_chip',
+				AF < 0.1 ~ 'small_chip',
+				AF >= 0.1 ~ 'big_chip'
+			),
+			has_dnmt3a = case_when(
+				is.na(chip_gene) ~ 'no_chip',
+				chip_gene != 'DNMT3A' ~ NA,
+				AF < 0.1 ~ 'small_d3a',
+				AF >= 0.1 ~ 'big_d3a'
+			),
+			has_tet2 = case_when(
+				is.na(chip_gene) ~ 'no_chip',
+				chip_gene != 'TET2' ~ NA,
+				AF < 0.1 ~ 'small_tet2',
+				AF >= 0.1 ~ 'big_tet2'
+			),
+			has_asxl1 = case_when(
+				is.na(chip_gene) ~ 'no_chip',
+				chip_gene != 'ASXL1' ~ NA,
+				AF < 0.1 ~ 'small_ax1',
+				AF >= 0.1 ~ 'big_ax1'
+			)
+		) |>
 		select(-date_last_dx) ->
 		result
 

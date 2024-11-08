@@ -13,11 +13,8 @@ one_cohort_results_plot = function(results,
 																	 andor = 'and',
 																	 p_or_q = 'p') {
 
-	stopifnot(p_or_q %in% c('p', 'q'))
-	p_or_q_name = paste0(p_or_q, ' value')
-
 	results |>
-		filter(sensspec == 'andor') |>
+		filter(sensspec == andor) |>
 		separate_wider_delim(term, delim = '_', names = c(NA, 'gene', 'size')) |>
 		mutate(ra_type = factor(ra_type, levels = c('ra', 'spra', 'snra'), labels = c('RA', 'SPRA', 'SNRA'))) |>
 		mutate(gene = as.numeric(factor(gene, levels = c('chip', 'dnmt3a', 'tet2', 'asxl1')))) |>

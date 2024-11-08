@@ -100,7 +100,10 @@ prepare_ra_outcomes = function(dx_code_counts_df,
 #' chip_calls includes: person_id (character), chip_gene (string or NA), and
 #' AF (double or NA).
 #'
-prepare_baseline_data = function(demographics, chip_calls, MIN_NUM_DX = 5) {
+prepare_baseline_data = function(demographics,
+																 chip_calls,
+																 CHIP_VAF_CUTOFF = 0.05,
+																 MIN_NUM_DX = 5) {
 
 	demographics |>
 		# filter out people with missing data
@@ -119,33 +122,33 @@ prepare_baseline_data = function(demographics, chip_calls, MIN_NUM_DX = 5) {
 		mutate(
 			censor_date = date_last_dx,
 			has_chip = case_when(
-				is.na(chip_gene) ~ 'no_chip',
-				AF < 0.1 ~ 'small_chip',
-				AF >= 0.1 ~ 'big_chip'
+				is.na(chip_gene) ~ 'none',
+				AF < CHIP_VAF_CUTOFF ~ 'small',
+				AF >= CHIP_VAF_CUTOFF ~ 'big'
 			),
 			has_dnmt3a = case_when(
-				is.na(chip_gene) ~ 'no_chip',
+				is.na(chip_gene) ~ 'none',
 				chip_gene != 'DNMT3A' ~ NA,
-				AF < 0.1 ~ 'small_chip',
-				AF >= 0.1 ~ 'big_chip'
+				AF < CHIP_VAF_CUTOFF ~ 'small',
+				AF >= CHIP_VAF_CUTOFF ~ 'big'
 			),
 			has_tet2 = case_when(
-				is.na(chip_gene) ~ 'no_chip',
+				is.na(chip_gene) ~ 'none',
 				chip_gene != 'TET2' ~ NA,
-				AF < 0.1 ~ 'small_chip',
-				AF >= 0.1 ~ 'big_chip'
+				AF < CHIP_VAF_CUTOFF ~ 'small',
+				AF >= CHIP_VAF_CUTOFF ~ 'big'
 			),
 			has_asxl1 = case_when(
-				is.na(chip_gene) ~ 'no_chip',
+				is.na(chip_gene) ~ 'none',
 				chip_gene != 'ASXL1' ~ NA,
-				AF < 0.1 ~ 'small_chip',
-				AF >= 0.1 ~ 'big_chip'
+				AF < CHIP_VAF_CUTOFF ~ 'small',
+				AF >= CHIP_VAF_CUTOFF ~ 'big'
 			)
 		) |>
-		mutate(has_chip = factor(has_chip, levels = c('no_chip', 'small_chip', 'big_chip')),
-					 has_dnmt3a = factor(has_dnmt3a, levels = c('no_chip', 'small_chip', 'big_chip')),
-					 has_tet2 = factor(has_tet2, levels = c('no_chip', 'small_chip', 'big_chip')),
-					 has_asxl1 = factor(has_asxl1, levels = c('no_chip', 'small_chip', 'big_chip'))) |>
+		mutate(has_chip = factor(has_chip, levels = c('none', 'small', 'big')),
+					 has_dnmt3a = factor(has_dnmt3a, levels = c('none', 'small', 'big')),
+					 has_tet2 = factor(has_tet2, levels = c('none', 'small', 'big')),
+					 has_asxl1 = factor(has_asxl1, levels = c('none', 'small', 'big'))) |>
 		select(-date_last_dx) ->
 		result
 

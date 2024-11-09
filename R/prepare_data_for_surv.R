@@ -102,7 +102,6 @@ prepare_ra_outcomes = function(dx_code_counts_df,
 #'
 prepare_baseline_data = function(demographics,
 																 chip_calls,
-																 CHIP_VAF_CUTOFF = 0.1,
 																 MIN_NUM_DX = 5) {
 
 	demographics |>
@@ -122,44 +121,48 @@ prepare_baseline_data = function(demographics,
 		mutate(
 			censor_date = date_last_dx,
 			has_chip = case_when(
-				is.na(chip_gene) ~ '_none',
-				AF < CHIP_VAF_CUTOFF ~ '_small',
-				AF >= CHIP_VAF_CUTOFF ~ '_big'
+				!is.na(chip_gene) ~ '_yes',
+				.default ~ '_no'
 			),
-			has_dnmt3a = case_when(
-				is.na(chip_gene) ~ '_none',
-				chip_gene != 'DNMT3A' ~ NA,
-				AF < CHIP_VAF_CUTOFF ~ '_small',
-				AF >= CHIP_VAF_CUTOFF ~ '_big'
+			has_chip_05 = case_when(
+				has_chip & AF > 0.05 ~ '_yes',
+				has_chip ~ NA,
+				.default ~ '_no'
 			),
-			has_tet2 = case_when(
-				is.na(chip_gene) ~ '_none',
-				chip_gene != 'TET2' ~ NA,
-				AF < CHIP_VAF_CUTOFF ~ '_small',
-				AF >= CHIP_VAF_CUTOFF ~ '_big'
+			has_chip_10 = case_when(
+				has_chip & AF > 0.10 ~ '_yes',
+				has_chip ~ NA,
+				.default ~ '_no'
 			),
-			has_asxl1 = case_when(
-				is.na(chip_gene) ~ '_none',
-				chip_gene != 'ASXL1' ~ NA,
-				AF < CHIP_VAF_CUTOFF ~ '_small',
-				AF >= CHIP_VAF_CUTOFF ~ '_big'
+			has_chip_15 = case_when(
+				has_chip & AF > 0.15 ~ '_yes',
+				has_chip ~ NA,
+				.default ~ '_no'
 			),
-			chip_af = case_when(
-				is.na(chip_gene) ~ 0,
-				.default = AF
-			),
-			dnmt3a_af = case_when(
-				chip_gene == 'DNMT3A' ~ AF,
-				.default = 0
-			),
-			tet2_af = case_when(
-				chip_gene == 'TET2' ~ AF,
-				.default = 0
-			),
-			asxl1_af = case_when(
-				chip_gene == 'ASXL1' ~ AF,
-				.default = 0
+			has_chip_20 = case_when(
+				has_chip & AF > 0.20 ~ '_yes',
+				has_chip ~ NA,
+				.default ~ '_no'
 			)
+			# has_dnmt3a = case_when(
+			# 	is.na(chip_gene) ~ '_none',
+			# 	chip_gene != 'DNMT3A' ~ NA,
+			# 	AF < CHIP_VAF_CUTOFF ~ '_small',
+			# 	AF >= CHIP_VAF_CUTOFF ~ '_big'
+			# ),
+			# has_tet2 = case_when(
+			# 	is.na(chip_gene) ~ '_none',
+			# 	chip_gene != 'TET2' ~ NA,
+			# 	AF < CHIP_VAF_CUTOFF ~ '_small',
+			# 	AF >= CHIP_VAF_CUTOFF ~ '_big'
+			# ),
+			# has_asxl1 = case_when(
+			# 	is.na(chip_gene) ~ '_none',
+			# 	chip_gene != 'ASXL1' ~ NA,
+			# 	AF < CHIP_VAF_CUTOFF ~ '_small',
+			# 	AF >= CHIP_VAF_CUTOFF ~ '_big'
+			# ),
+			#
 		) |>
 		mutate(has_chip = factor(has_chip, levels = c('_none', '_small', '_big')),
 					 has_dnmt3a = factor(has_dnmt3a, levels = c('_none', '_small', '_big')),

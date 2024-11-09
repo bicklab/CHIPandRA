@@ -90,7 +90,7 @@ chip_to_ra_survival = function(bl_data,
 				if (debug) { browser() }
 
 				tidy(fit) |>
-					filter(str_detect(term, 'has_')) |>
+					filter(str_detect(term, '(chip)|(dnmt3a)|(tet2)|(asxl1)')) |>
 					mutate(ra_type = ra_type,
 								 sensspec = sensspec,
 								 outcome = outcome_str,

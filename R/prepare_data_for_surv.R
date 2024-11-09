@@ -122,27 +122,27 @@ prepare_baseline_data = function(demographics,
 			censor_date = date_last_dx,
 			has_chip = case_when(
 				!is.na(chip_gene) ~ '_yes',
-				.default ~ '_no'
+				.default = '_no'
 			),
 			has_chip_05 = case_when(
 				has_chip & AF > 0.05 ~ '_yes',
 				has_chip ~ NA,
-				.default ~ '_no'
+				.default = '_no'
 			),
 			has_chip_10 = case_when(
 				has_chip & AF > 0.10 ~ '_yes',
 				has_chip ~ NA,
-				.default ~ '_no'
+				.default = '_no'
 			),
 			has_chip_15 = case_when(
 				has_chip & AF > 0.15 ~ '_yes',
 				has_chip ~ NA,
-				.default ~ '_no'
+				.default = '_no'
 			),
 			has_chip_20 = case_when(
 				has_chip & AF > 0.20 ~ '_yes',
 				has_chip ~ NA,
-				.default ~ '_no'
+				.default = '_no'
 			)
 			# has_dnmt3a = case_when(
 			# 	is.na(chip_gene) ~ '_none',

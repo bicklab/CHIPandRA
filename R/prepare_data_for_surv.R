@@ -172,22 +172,22 @@ prepare_baseline_data = function(demographics,
 				chip_gene == 'TET2' ~ TRUE,
 				.default = FALSE
 			),
-			has_dnmt3a_05 = case_when(
+			has_tet2_05 = case_when(
 				has_tet2 & AF > 0.05 ~ TRUE,
 				has_tet2 ~ NA,
 				.default = FALSE
 			),
-			has_dnmt3a_10 = case_when(
+			has_tet2_10 = case_when(
 				has_tet2 & AF > 0.10 ~ TRUE,
 				has_tet2 ~ NA,
 				.default = FALSE
 			),
-			has_dnmt3a_15 = case_when(
+			has_tet2_15 = case_when(
 				has_tet2 & AF > 0.15 ~ TRUE,
 				has_tet2 ~ NA,
 				.default = FALSE
 			),
-			has_dnmt3a_20 = case_when(
+			has_tet2_20 = case_when(
 				has_tet2 & AF > 0.20 ~ TRUE,
 				has_tet2 ~ NA,
 				.default = FALSE

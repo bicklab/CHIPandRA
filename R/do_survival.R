@@ -63,25 +63,25 @@ chip_to_ra_survival = function(bl_data,
 
 				message('Starting ', chip_type, '...')
 
-				df_for_surv |>
-					filter(if_any({{chip_type}}, ~!is.na(.))) |>
-					group_by(across(chip_type)) |>
-					summarise(
-						num_pts = n(),
-						total_fu = sum(time_at_risk),
-						mean_fu = total_fu / num_pts,
-						median_fu = median(time_at_risk),
-						n_event = sum(!is.na(.data[[outcome_str]])),
-						events_per_py = n_event / total_fu) |>
-					arrange({{chip_type}}) ->
-					event_counts
+				# df_for_surv |>
+				# 	filter(if_any({{chip_type}}, ~!is.na(.))) |>
+				# 	group_by(across(chip_type)) |>
+				# 	summarise(
+				# 		num_pts = n(),
+				# 		total_fu = sum(time_at_risk),
+				# 		mean_fu = total_fu / num_pts,
+				# 		median_fu = median(time_at_risk),
+				# 		n_event = sum(!is.na(.data[[outcome_str]])),
+				# 		events_per_py = n_event / total_fu) |>
+				# 	arrange({{chip_type}}) ->
+				# 	event_counts
 
 				if (sum(event_counts$n_event) < min_num_events) { next }
 				if (min(event_counts$n_event) < min_num_events_w_chip) { next }
 
 				if (debug) { browser() }
 
-				str_form = glue('Surv(time = time_at_risk, event = event) ~ age_at_biosample + age2 + sex + race + ever_smoker + {chip_type}')
+				str_form = glue('Surv(time = time_at_risk, event = event) ~ age_at_biosample + age2 + sex + race + ever_smoker + has_chip + chip_af')
 				fit = tryCatch(
 					coxph(as.formula(str_form), data = df_for_surv),
 					finally = NULL
@@ -94,31 +94,32 @@ chip_to_ra_survival = function(bl_data,
 					mutate(ra_type = ra_type,
 								 sensspec = sensspec,
 								 outcome = outcome_str,
-								 num_prevalent_dz = nrow(df_for_survprep) - nrow(df_for_surv),
+								 num_prevalent_dz = nrow(df_for_survprep) - nrow(df_for_surv)
 
-								 num_pts_no_chip = event_counts[['num_pts']][1],
-								 num_pts_small_chip = event_counts[['num_pts']][2],
-								 num_pts_big_chip = event_counts[['num_pts']][3],
-
-								 total_fu_no_chip = event_counts[['total_fu']][1],
-								 total_fu_small_chip = event_counts[['total_fu']][2],
-								 total_fu_big_chip = event_counts[['total_fu']][3],
-
-								 mean_fu_no_chip = event_counts[['mean_fu']][1],
-								 mean_fu_small_chip = event_counts[['mean_fu']][2],
-								 mean_fu_big_chip = event_counts[['mean_fu']][3],
-
-								 median_fu_no_chip = event_counts[['median_fu']][1],
-								 median_fu_small_chip = event_counts[['median_fu']][2],
-								 median_fu_big_chip = event_counts[['median_fu']][3],
-
-								 num_events_no_chip = event_counts[['n_event']][1],
-								 num_events_small_chip = event_counts[['n_event']][2],
-								 num_events_big_chip = event_counts[['n_event']][3],
-
-								 event_rate_no_chip = event_counts[['events_per_py']][1],
-								 event_rate_small_chip = event_counts[['events_per_py']][2],
-								 event_rate_big_chip = event_counts[['events_per_py']][3])  ->
+								 # num_pts_no_chip = event_counts[['num_pts']][1],
+								 # num_pts_small_chip = event_counts[['num_pts']][2],
+								 # num_pts_big_chip = event_counts[['num_pts']][3],
+								 #
+								 # total_fu_no_chip = event_counts[['total_fu']][1],
+								 # total_fu_small_chip = event_counts[['total_fu']][2],
+								 # total_fu_big_chip = event_counts[['total_fu']][3],
+								 #
+								 # mean_fu_no_chip = event_counts[['mean_fu']][1],
+								 # mean_fu_small_chip = event_counts[['mean_fu']][2],
+								 # mean_fu_big_chip = event_counts[['mean_fu']][3],
+								 #
+								 # median_fu_no_chip = event_counts[['median_fu']][1],
+								 # median_fu_small_chip = event_counts[['median_fu']][2],
+								 # median_fu_big_chip = event_counts[['median_fu']][3],
+								 #
+								 # num_events_no_chip = event_counts[['n_event']][1],
+								 # num_events_small_chip = event_counts[['n_event']][2],
+								 # num_events_big_chip = event_counts[['n_event']][3],
+								 #
+								 # event_rate_no_chip = event_counts[['events_per_py']][1],
+								 # event_rate_small_chip = event_counts[['events_per_py']][2],
+								 # event_rate_big_chip = event_counts[['events_per_py']][3]
+								 )  ->
 					toresult
 				results[[paste0(outcome_str, '_', chip_type)]] = toresult
 			}

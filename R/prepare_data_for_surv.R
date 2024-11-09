@@ -102,7 +102,7 @@ prepare_ra_outcomes = function(dx_code_counts_df,
 #'
 prepare_baseline_data = function(demographics,
 																 chip_calls,
-																 CHIP_VAF_CUTOFF = 0.05,
+																 CHIP_VAF_CUTOFF = 0.1,
 																 MIN_NUM_DX = 5) {
 
 	demographics |>
@@ -143,6 +143,22 @@ prepare_baseline_data = function(demographics,
 				chip_gene != 'ASXL1' ~ NA,
 				AF < CHIP_VAF_CUTOFF ~ '_small',
 				AF >= CHIP_VAF_CUTOFF ~ '_big'
+			),
+			chip_af = case_when(
+				is.na(chip_gene) ~ 0,
+				.default = AF
+			),
+			dnmt3a_af = case_when(
+				chip_gene == 'DNMT3A' ~ AF,
+				.default = 0
+			),
+			tet2_af = case_when(
+				chip_gene == 'TET2' ~ AF,
+				.default = 0
+			),
+			asxl1_af = case_when(
+				chip_gene == 'ASXL1' ~ AF,
+				.default = 0
 			)
 		) |>
 		mutate(has_chip = factor(has_chip, levels = c('_none', '_small', '_big')),

@@ -143,26 +143,55 @@ prepare_baseline_data = function(demographics,
 				has_chip & AF > 0.20 ~ TRUE,
 				has_chip ~ NA,
 				.default = FALSE
+			),
+			has_dnmt3a = case_when(
+				chip_gene == 'DNMT3A' ~ TRUE,
+				.default = FALSE
+			),
+			has_dnmt3a_05 = case_when(
+				has_dnmt3a & AF > 0.05 ~ TRUE,
+				has_dnmt3a ~ NA,
+				.default = FALSE
+			),
+			has_dnmt3a_10 = case_when(
+				has_dnmt3a & AF > 0.10 ~ TRUE,
+				has_dnmt3a ~ NA,
+				.default = FALSE
+			),
+			has_dnmt3a_15 = case_when(
+				has_dnmt3a & AF > 0.15 ~ TRUE,
+				has_dnmt3a ~ NA,
+				.default = FALSE
+			),
+			has_dnmt3a_20 = case_when(
+				has_dnmt3a & AF > 0.20 ~ TRUE,
+				has_dnmt3a ~ NA,
+				.default = FALSE
+			),
+			has_tet2 = case_when(
+				chip_gene == 'TET2' ~ TRUE,
+				.default = FALSE
+			),
+			has_dnmt3a_05 = case_when(
+				has_tet2 & AF > 0.05 ~ TRUE,
+				has_tet2 ~ NA,
+				.default = FALSE
+			),
+			has_dnmt3a_10 = case_when(
+				has_tet2 & AF > 0.10 ~ TRUE,
+				has_tet2 ~ NA,
+				.default = FALSE
+			),
+			has_dnmt3a_15 = case_when(
+				has_tet2 & AF > 0.15 ~ TRUE,
+				has_tet2 ~ NA,
+				.default = FALSE
+			),
+			has_dnmt3a_20 = case_when(
+				has_tet2 & AF > 0.20 ~ TRUE,
+				has_tet2 ~ NA,
+				.default = FALSE
 			)
-			# has_dnmt3a = case_when(
-			# 	is.na(chip_gene) ~ '_none',
-			# 	chip_gene != 'DNMT3A' ~ NA,
-			# 	AF < CHIP_VAF_CUTOFF ~ '_small',
-			# 	AF >= CHIP_VAF_CUTOFF ~ '_big'
-			# ),
-			# has_tet2 = case_when(
-			# 	is.na(chip_gene) ~ '_none',
-			# 	chip_gene != 'TET2' ~ NA,
-			# 	AF < CHIP_VAF_CUTOFF ~ '_small',
-			# 	AF >= CHIP_VAF_CUTOFF ~ '_big'
-			# ),
-			# has_asxl1 = case_when(
-			# 	is.na(chip_gene) ~ '_none',
-			# 	chip_gene != 'ASXL1' ~ NA,
-			# 	AF < CHIP_VAF_CUTOFF ~ '_small',
-			# 	AF >= CHIP_VAF_CUTOFF ~ '_big'
-			# ),
-			#
 		) |>
 		# mutate(has_chip = factor(has_chip, levels = c('_none', '_small', '_big')),
 		# 			 has_dnmt3a = factor(has_dnmt3a, levels = c('_none', '_small', '_big')),

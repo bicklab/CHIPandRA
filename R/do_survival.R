@@ -42,7 +42,7 @@ chip_to_ra_survival = function(bl_data,
 
 	for (ra_type in ra_types) {
 
-		message('\n*** Starting ', ra_type, '...')
+		message('*** Starting ', ra_type, '...')
 
 		for (sensspec in sensspecs) {
 

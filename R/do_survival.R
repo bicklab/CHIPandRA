@@ -76,8 +76,8 @@ chip_to_ra_survival = function(bl_data,
 				# 	arrange({{chip_type}}) ->
 				# 	event_counts
 
-				if (sum(event_counts$n_event) < min_num_events) { next }
-				if (min(event_counts$n_event) < min_num_events_w_chip) { next }
+				# if (sum(event_counts$n_event) < min_num_events) { next }
+				# if (min(event_counts$n_event) < min_num_events_w_chip) { next }
 
 				if (debug) { browser() }
 

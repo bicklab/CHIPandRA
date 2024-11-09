@@ -164,10 +164,10 @@ prepare_baseline_data = function(demographics,
 			# ),
 			#
 		) |>
-		mutate(has_chip = factor(has_chip, levels = c('_none', '_small', '_big')),
-					 has_dnmt3a = factor(has_dnmt3a, levels = c('_none', '_small', '_big')),
-					 has_tet2 = factor(has_tet2, levels = c('_none', '_small', '_big')),
-					 has_asxl1 = factor(has_asxl1, levels = c('_none', '_small', '_big'))) |>
+		# mutate(has_chip = factor(has_chip, levels = c('_none', '_small', '_big')),
+		# 			 has_dnmt3a = factor(has_dnmt3a, levels = c('_none', '_small', '_big')),
+		# 			 has_tet2 = factor(has_tet2, levels = c('_none', '_small', '_big')),
+		# 			 has_asxl1 = factor(has_asxl1, levels = c('_none', '_small', '_big'))) |>
 		select(-date_last_dx) ->
 		result
 

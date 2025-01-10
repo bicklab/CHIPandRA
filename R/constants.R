@@ -5,4 +5,5 @@ ra_drugs = c('hydroxychloroquine', 'sulfasalazine', 'methotrexate', 'leflunomide
 						 'anakinra',
 						 'rituximab',
 						 'tofacitinib', 'baricitinib', 'upadacitinib', 'filgotinib')
+
 ra_drug_regex = paste0('(', paste(ra_drugs, collapse = ')|('), ')')

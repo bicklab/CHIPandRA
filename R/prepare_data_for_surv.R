@@ -1,3 +1,7 @@
+case_when_na = function(...) {
+	case_when(..., .default = NA_Date_)
+}
+
 #' @title Prepare RA Outcomes
 #'
 #' @param dx_code_counts_df tibble of diagnosis codes. See details.
@@ -26,11 +30,10 @@
 #' codes, labs, and meds
 #'
 #' @export
-#'
 prepare_ra_outcomes = function(dx_code_counts_df,
 															 serostatus_df,
 															 ra_meds_df,
-															 min_num_dx_codes) {
+															 min_num_dx_codes = 2) {
 
 	dx_code_counts_df |>
 		filter(dx_count >= min_num_dx_codes) |>
@@ -51,31 +54,29 @@ prepare_ra_outcomes = function(dx_code_counts_df,
 		left_join(serostatus_df, by = 'person_id') |>
 		left_join(ra_meds_df, by = 'person_id') |>
 		mutate(
-			date_first_ra_or = case_when(
-				!is.na(seropos) | treated_w_ra_meds ~ date_first_ra,
-				.default = NA_Date_),
+			date_first_ra_or = case_when_na(
+				!is.na(seropos) | treated_w_ra_meds ~ date_first_ra),
 
-			date_first_spra_or = case_when(
+			date_first_spra_or = case_when_na(
+				# for pts who quality based on labs, any RA dx counts as SPRA
 				seropos ~ date_first_ra,
-				treated_w_ra_meds ~ date_first_spra,
-				.default = NA_Date_),
+				# for pts who quality based on meds, only SPRA dx counts as SPRA
+				treated_w_ra_meds ~ date_first_spra),
 
-			date_first_snra_or = case_when(
+			date_first_snra_or = case_when_na(
+				# for pts who quality based on labs, any RA dx counts as SNRA
 				!seropos ~ date_first_ra,
-				treated_w_ra_meds ~ date_first_snra,
-				.default = NA_Date_),
+				# for pts who quality based on meds, only SNRA dx counts as SNRA
+				treated_w_ra_meds ~ date_first_snra),
 
-			date_first_ra_and = case_when(
-				!is.na(seropos) & treated_w_ra_meds ~ date_first_ra,
-				.default = NA_Date_),
+			date_first_ra_and = case_when_na(
+				!is.na(seropos) & treated_w_ra_meds ~ date_first_ra),
 
-			date_first_spra_and = case_when(
-				seropos & treated_w_ra_meds ~ date_first_ra,
-				.default = NA_Date_),
+			date_first_spra_and = case_when_na(
+				seropos & treated_w_ra_meds ~ date_first_ra),
 
-			date_first_snra_and = case_when(
-				!seropos & treated_w_ra_meds ~ date_first_ra,
-				.default = NA_Date_)
+			date_first_snra_and = case_when_na(
+				!seropos & treated_w_ra_meds ~ date_first_ra)
 		) |>
 		select(-seropos, -treated_w_ra_meds) |>
 		mutate(across(starts_with('date_first'), as.Date)) ->
@@ -84,11 +85,32 @@ prepare_ra_outcomes = function(dx_code_counts_df,
 	return(result)
 }
 
+# Function to check if mutation is present for a given gene
+check_gene_mutation <- function() {
+	gene_name <- str_remove(cur_column(), "has_") |> toupper()
+	return(chip_gene == gene_name)
+}
+
+# Function to create threshold variants for a mutation indicator
+create_threshold_variants <- function(has_mutation, af_value, threshold) {
+	case_when(
+		has_mutation & af_value > threshold ~ TRUE,
+		has_mutation ~ NA,
+		.default = FALSE
+	)
+}
+
+# Function to generate threshold variants for a column
+apply_thresholds <- function(has_mutation_col) {
+	map(thresholds, function(t) create_threshold_variants(has_mutation_col, AF, t))
+}
+
 
 #' @title prepare baseline data
 #'
 #' @param demographics tibble with baseline demographic data. See details.
 #' @param chip_calls tibble with chip call status. See details
+#' @param min_num_dx minimum number of diagnoses a patient must have to be studied
 #'
 #' @return baseline data prepped for survival analysis
 #'
@@ -102,7 +124,9 @@ prepare_ra_outcomes = function(dx_code_counts_df,
 #'
 prepare_baseline_data = function(demographics,
 																 chip_calls,
-																 MIN_NUM_DX = 5) {
+																 min_num_dx = 5,
+																 thresholds = c("05" = 0.05, "10" = 0.10, "15" = 0.15, "20" = 0.20),
+																 genes = c("DNMT3A", "TET2")) {
 
 	demographics |>
 		# filter out people with missing data
@@ -110,7 +134,7 @@ prepare_baseline_data = function(demographics,
 		filter(!is.na(ever_smoker), !is.na(biosample_date), !is.na(age_at_biosample)) |>
 		filter(!is.na(age2), !is.na(date_last_dx)) |>
 		# must have at least 5 dx codes observed
-		filter(num_dx >= MIN_NUM_DX) |>
+		filter(num_dx >= min_num_dx) |>
 		# must have some observation time after biosample_date
 		filter(date_last_dx > biosample_date) ->
 		cohort_for_study
@@ -120,83 +144,22 @@ prepare_baseline_data = function(demographics,
 		filter(is.na(date_first_heme_ca) | date_first_heme_ca > biosample_date) |>
 		mutate(
 			censor_date = date_last_dx,
-			has_chip = case_when(
-				!is.na(chip_gene) ~ TRUE,
-				.default = FALSE
-			),
-			has_chip_05 = case_when(
-				has_chip & AF > 0.05 ~ TRUE,
-				has_chip ~ NA,
-				.default = FALSE
-			),
-			has_chip_10 = case_when(
-				has_chip & AF > 0.10 ~ TRUE,
-				has_chip ~ NA,
-				.default = FALSE
-			),
-			has_chip_15 = case_when(
-				has_chip & AF > 0.15 ~ TRUE,
-				has_chip ~ NA,
-				.default = FALSE
-			),
-			has_chip_20 = case_when(
-				has_chip & AF > 0.20 ~ TRUE,
-				has_chip ~ NA,
-				.default = FALSE
-			),
-			has_dnmt3a = case_when(
-				chip_gene == 'DNMT3A' ~ TRUE,
-				.default = FALSE
-			),
-			has_dnmt3a_05 = case_when(
-				has_dnmt3a & AF > 0.05 ~ TRUE,
-				has_dnmt3a ~ NA,
-				.default = FALSE
-			),
-			has_dnmt3a_10 = case_when(
-				has_dnmt3a & AF > 0.10 ~ TRUE,
-				has_dnmt3a ~ NA,
-				.default = FALSE
-			),
-			has_dnmt3a_15 = case_when(
-				has_dnmt3a & AF > 0.15 ~ TRUE,
-				has_dnmt3a ~ NA,
-				.default = FALSE
-			),
-			has_dnmt3a_20 = case_when(
-				has_dnmt3a & AF > 0.20 ~ TRUE,
-				has_dnmt3a ~ NA,
-				.default = FALSE
-			),
-			has_tet2 = case_when(
-				chip_gene == 'TET2' ~ TRUE,
-				.default = FALSE
-			),
-			has_tet2_05 = case_when(
-				has_tet2 & AF > 0.05 ~ TRUE,
-				has_tet2 ~ NA,
-				.default = FALSE
-			),
-			has_tet2_10 = case_when(
-				has_tet2 & AF > 0.10 ~ TRUE,
-				has_tet2 ~ NA,
-				.default = FALSE
-			),
-			has_tet2_15 = case_when(
-				has_tet2 & AF > 0.15 ~ TRUE,
-				has_tet2 ~ NA,
-				.default = FALSE
-			),
-			has_tet2_20 = case_when(
-				has_tet2 & AF > 0.20 ~ TRUE,
-				has_tet2 ~ NA,
-				.default = FALSE
+			has_chip = !is.na(chip_gene),
+			# Create base gene indicators
+			across(
+				all_of(paste0("has_", tolower(genes))),
+				check_gene_mutation,
+				.names = "{.col}"
 			)
 		) |>
-		# mutate(has_chip = factor(has_chip, levels = c('_none', '_small', '_big')),
-		# 			 has_dnmt3a = factor(has_dnmt3a, levels = c('_none', '_small', '_big')),
-		# 			 has_tet2 = factor(has_tet2, levels = c('_none', '_small', '_big')),
-		# 			 has_asxl1 = factor(has_asxl1, levels = c('_none', '_small', '_big'))) |>
+		# Add threshold variations for CHIP and each gene
+		mutate(
+			across(
+				starts_with("has_"),
+				apply_thresholds,
+				.names = "{.col}_{names(thresholds)}"
+			)
+		) |>
 		select(-date_last_dx) ->
 		result
 

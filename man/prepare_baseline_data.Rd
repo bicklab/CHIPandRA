@@ -4,12 +4,20 @@
 \alias{prepare_baseline_data}
 \title{prepare baseline data}
 \usage{
-prepare_baseline_data(demographics, chip_calls)
+prepare_baseline_data(
+  demographics,
+  chip_calls,
+  min_num_dx = 5,
+  thresholds = c(`05` = 0.05, `10` = 0.1, `15` = 0.15, `20` = 0.2),
+  genes = c("DNMT3A", "TET2")
+)
 }
 \arguments{
 \item{demographics}{tibble with baseline demographic data. See details.}
 
 \item{chip_calls}{tibble with chip call status. See details}
+
+\item{min_num_dx}{minimum number of diagnoses a patient must have to be studied}
 }
 \value{
 baseline data prepped for survival analysis

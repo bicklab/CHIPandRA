@@ -4,7 +4,13 @@
 \alias{do_meta_analysis}
 \title{Do metaanalysis}
 \usage{
-do_meta_analysis()
+do_meta_analysis(
+  plot_height = 5,
+  plot_width = 7,
+  plot_ukb = TRUE,
+  plot_aou = TRUE,
+  plot_biovu = TRUE
+)
 }
 \value{
 none, just side effects of tables and plots

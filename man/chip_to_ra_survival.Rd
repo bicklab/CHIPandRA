@@ -7,10 +7,10 @@
 chip_to_ra_survival(
   bl_data,
   outcomes,
-  min_num_events = 100,
-  min_num_events_w_chip = 10,
+  min_num_events = 10,
+  min_num_events_w_chip = 1,
   ra_types = c("ra", "spra", "snra"),
-  sensspecs = c("sensitive", "moderate", "specific"),
+  sensspecs = c("or", "and"),
   chip_types = names(select(bl_data, starts_with("has_chip"))),
   debug = FALSE
 )

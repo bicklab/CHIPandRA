@@ -145,12 +145,9 @@ prepare_baseline_data = function(demographics,
 		mutate(
 			censor_date = date_last_dx,
 			has_chip = !is.na(chip_gene),
-			# Create base gene indicators
-			across(
-				all_of(paste0("has_", tolower(genes))),
-				check_gene_mutation,
-				.names = "{.col}"
-			)
+			# First create the gene columns
+			has_dnmt3a = chip_gene == "DNMT3A",
+			has_tet2 = chip_gene == "TET2"
 		) |>
 		# Add threshold variations for CHIP and each gene
 		mutate(

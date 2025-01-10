@@ -8,7 +8,7 @@ prepare_ra_outcomes(
   dx_code_counts_df,
   serostatus_df,
   ra_meds_df,
-  min_num_dx_codes
+  min_num_dx_codes = 2
 )
 }
 \arguments{

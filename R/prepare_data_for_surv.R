@@ -101,8 +101,8 @@ create_threshold_variants <- function(has_mutation, af_value, threshold) {
 }
 
 # Function to generate threshold variants for a column
-apply_thresholds <- function(has_mutation_col) {
-	map(thresholds, function(t) create_threshold_variants(has_mutation_col, AF, t))
+apply_thresholds <- function(has_mutation_col, af_col = AF) {
+	map_dfc(thresholds, function(t) create_threshold_variants(has_mutation_col, af_col, t))
 }
 
 
@@ -145,17 +145,26 @@ prepare_baseline_data = function(demographics,
 		mutate(
 			censor_date = date_last_dx,
 			has_chip = !is.na(chip_gene),
-			# First create the gene columns
 			has_dnmt3a = chip_gene == "DNMT3A",
 			has_tet2 = chip_gene == "TET2"
 		) |>
-		# Add threshold variations for CHIP and each gene
+		# Add threshold variations one at a time
 		mutate(
-			across(
-				starts_with("has_"),
-				apply_thresholds,
-				.names = "{.col}_{names(thresholds)}"
-			)
+			# CHIP thresholds
+			has_chip_05 = create_threshold_variants(has_chip, AF, 0.05),
+			has_chip_10 = create_threshold_variants(has_chip, AF, 0.10),
+			has_chip_15 = create_threshold_variants(has_chip, AF, 0.15),
+			has_chip_20 = create_threshold_variants(has_chip, AF, 0.20),
+			# DNMT3A thresholds
+			has_dnmt3a_05 = create_threshold_variants(has_dnmt3a, AF, 0.05),
+			has_dnmt3a_10 = create_threshold_variants(has_dnmt3a, AF, 0.10),
+			has_dnmt3a_15 = create_threshold_variants(has_dnmt3a, AF, 0.15),
+			has_dnmt3a_20 = create_threshold_variants(has_dnmt3a, AF, 0.20),
+			# TET2 thresholds
+			has_tet2_05 = create_threshold_variants(has_tet2, AF, 0.05),
+			has_tet2_10 = create_threshold_variants(has_tet2, AF, 0.10),
+			has_tet2_15 = create_threshold_variants(has_tet2, AF, 0.15),
+			has_tet2_20 = create_threshold_variants(has_tet2, AF, 0.20)
 		) |>
 		select(-date_last_dx) ->
 		result
